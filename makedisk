@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+
+SCRIPTDIR="$( cd $( dirname $0 ) && pwd )"
+[ -z "${SCRIPTDIR}" ] && { echo >&2 Could not identify script location; exit 1; }
+[ -d "${SCRIPTDIR}" ] || { echo >&2 Could not identify script location; exit 1; }
+WORKDIR="${SCRIPTDIR}/work"
+mkdir -p "${WORKDIR}"
+
+AMITOOLS="/Users/richard/Dropbox/Personal/Amiga/amitools"
+RDBTOOL="${AMITOOLS}/rdbtool"
+XDFTOOL="${AMITOOLS}/xdftool"
+
+HDF="${WORKDIR}/amiga8gb.hdf"
+#HDF="/dev/disk2"
+GEOMETRY="chs=16278,15,62"
+
+MONITORS="DblNTSC DblPAL Multiscan NTSC"
+STORAGE_COPY="$( for m in $MONITORS; do echo Monitors/$m Monitors/$m.info; done )"
+
+[ -d "${AMITOOLS}" ] || { echo amitools not found at ${AMITOOLS} ; exit 1 ; }
+[ -x "${RDBTOOL}" ] || { echo rdbtool not found / not executable at ${RDBTOOL} ; exit 1 ; }
+[ -x "${XDFTOOL}" ] || { echo xdftool not found / not executable at ${XDFTOOL} ; exit 1 ; }
+
+echo amitools is at ${AMITOOLS}
+echo Working on disk: \"${HDF}\" with geometry ${GEOMETRY}
+echo Copy out of storage: $STORAGE_COPY
+
+function rdbtool() {
+    if [ "$1" == "create" ]; then
+        shift
+        echo RDB: create ${GEOMETRY} "$@"
+        "${RDBTOOL}" "${HDF}" create ${GEOMETRY} "$@"
+    else
+        echo RDB: open ${GEOMETRY} + "$@"
+        "${RDBTOOL}" "${HDF}" open ${GEOMETRY} + "$@"
+    fi
+}
+
+function xdftool() {
+    if [ "$1" == "create" ]; then
+        shift
+        echo XDF: create ${GEOMETRY} "$@"
+        "${XDFTOOL}" "${HDF}" create ${GEOMETRY} "$@"
+    else
+        echo XDF: open ${GEOMETRY} "$@"
+        "${XDFTOOL}" "${HDF}" open ${GEOMETRY} "$@"
+    fi
+}
+
+set -e
+
+# Create new disk
+[ -f "${HDF}" ] && rm "${HDF}"
+rdbtool create
+rdbtool init
+rdbtool add size=500MiB bootable=1
+
+# Create Workbench partition and clone from Cloanto Classic Support
+xdftool part=0 + format Workbench ffs intl
+xdftool part=0 + repack "${SCRIPTDIR}/licensed/workbench-310.hdf"
+
+# Copy FastFileSystem to the RDB
+[ -f "${WORKDIR}/FastFileSystem" ] && rm "${WORKDIR}/FastFileSystem"
+xdftool part=0 + read L/FastFileSystem "${WORKDIR}/FastFileSystem"
+rdbtool fsadd "${WORKDIR}/FastFileSystem"
+
+# Copy from Storage to Devs
+for file in $STORAGE_COPY; do
+    xdftool part=0 + read "Storage/${file}" "$( basename ${file} )" + write "$( basename ${file} )" "Devs/${file}" + delete "Storage/${file}"
+    rm "$( basename ${file} )"
+done
+
+# Patch in the Apollo 68060 support
+if [ -d "${SCRIPTDIR}/licensed/Apollo-68068" ]; then
+    xdftool part=0 + delete Libs/68040.library
+    for file in "${SCRIPTDIR}"/licensed/Apollo-68060/cpu60; do xdftool part=0 + write "${file}" "C/$( basename "${file}" )"; done
+    for file in "${SCRIPTDIR}"/licensed/Apollo-68060/*.library; do xdftool part=0 + write "${file}" "Libs/$( basename "${file}" )"; done
+fi
+
+rdbtool add size=3500MB bootable=0
+xdftool part=1 + format Work ffs intl
+
+# Add the bonus material
+if [ -f "${SCRIPTDIR}/StarterKit.xdfmeta" ]; then
+    xdftool part=1 + pack StarterKit
+elif [ -d "${SCRIPTDIR}/StarterKit" ]; then
+    xdftool part=1 + write StarterKit /
+fi
+
+# Final output
+rdbtool info
+echo Workbench:
+xdftool part=0 + info
+echo StarterKit:
+xdftool part=1 + info
