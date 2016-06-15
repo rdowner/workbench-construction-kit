@@ -1,0 +1,484 @@
+__________________________________________________________________________
+==========================================================================
+
+                            Update history for
+
+                                LhA V1.38
+
+                  Copyright (c) 1991,92 by Stefan Boberg
+                           All rights reserved.
+
+__________________________________________________________________________
+==========================================================================
+
+V1.38 : August 27 1992
+
+[ Interim release ]
+
+- Fixed `-s' option. Now it finally works. Somehow I forgot to implement
+  this before.
+
+- Fixed bug when specifying the same file twice.
+  (Roland Bless & Lazarus Marhenke)
+
+V1.37 : Not really released
+
+- Fixed bug in handling of `~', `[' and `]' wildcard tokens. Would not
+  work unless national translation was enabled. (Affected V1.32 -> V1.36)
+  (Mattias Korsbäck)
+
+V1.36 : August 18 1992
+
+[Miscellaneous bugfixes from LhA V2.00 as an interim solution until it is
+released].
+
+- Added code to handle case when LhA is called with a bad environment,
+  i.e. all fields in the process structure not correctly initialized.
+  This should take care of most problems arising with brain-damaged
+  programs such as GCCHost, which fail to set up a CLI structure.
+
+- LhA now respects -x setting with level-[12] headers.
+
+- Added protection for `s:startup-sequence'-type hacks. (A.J. Brouwer)
+
+- Fixed requester suppression bug. Only appeared if you had no LHAOPTS
+  environment variable. (Many reports).
+
+V1.35 :
+
+- Added `y' command ("copy archive with new options"). Name says it all.
+  See manual for details.
+
+- Added `h' command ("hunt for diffs arc <-> filesys"). This command
+  compares the contents of an archive with the contents of the current
+  or `destination' directory, and reports any differences. Useful to see
+  what files have changed since the last backup/archiving. With this
+  command the `-D' option setting affects what method of display is
+  used.
+
+V1.34 :
+
+- Fixed bug in SetFDate() which would cause LhA to leave files locked
+  until the end of the program, thus disabling the `-Qd' option.
+
+- Fixed bug in level-1 header handling. Would cause LhA to generate
+  corrupted entries when a delete/update operation was performed on
+  an archive containing level-1 headers with extended headers.
+
+- Added `c' (concatenate) command. With this command it is possible to
+  concatenate two or more archives into one, or to append one or more
+  archives to another. Currently it does not check for duplicate files.
+
+V1.33 :
+
+- Fixed Enforcer hit in `LhX'.
+
+- Reduced executable size even further by compressing the usage texts.
+  Gains 1-2K depending on program version.
+
+- Reduced executable size by approximately 1KB. No change in memory
+  requirements however.
+
+- The `-Qq' option is now implemented. When it is enabled LhA will not
+  perform the standard archive scan-through before adding files to the
+  archive. This will speed up the operation considerably, but can cause
+  problems if the archive has no archive terminator (if an update
+  operation was aborted with CTRL-C for instance). This also means that
+  LhA will not check if a file already exists in the archive; thus a file
+  can be added to an archive twice. Useful if you know the files you're
+  adding are not already in the archive (Fido Mail-packets for instance).
+  (Roger Nordin)
+
+- Now the `-B' option is implemented. When this option is enabled, LhA
+  will keep the original archive renamed to `xxx.bak' when files are
+  removed from an archive (via the delete, freshen, replace, or update
+  commands).
+
+- Now checks that `-P' task priority is in the correct range ( [-5,5] )
+
+- With V37+, now sets WILDSTAR flag in dl_Root->rn_Flags to enable the `*'
+  wildcard, which is disabled by default in OS2.x. Many people thought
+  this was a bug in LhA, but it really is because when LhA started using
+  the V37 dos.library pattern routines, some people did not use a program
+  such as `star' or `starburst'. This *WAS* mentioned in the manual.
+
+- With V37+, now uses SetFileDate() to set directory/file dates. With
+  pre-V37 uses packets instead.
+
+V1.32 : May 1992
+
+- No longer creates empty archives if no files to add to the new archive
+  are found. (Roger Nordin)
+
+- Changed `vv' list output format. The Host OS is now spelled out (i.e.
+  `Amiga' and `Unix' instead of `A' and `U' for example).
+
+- Fixed problem where a CTRL-C user break occasionally would cause LhA to
+  leave a file locked on exit (extraction only).
+
+- Case conversion with `-u' and `-l' options now also affect archiving as
+  intended.
+
+- Added `-Qn' option to optionally enable/disable case conversion of
+  national characters. This should be disabled when running 1.3 or 2.04
+  with the old FFS and OFS file systems which handles national characters
+  incorrectly when calculating filename hash values. With WB2.1 you can
+  format `national' filesystem disks (`DOS\2' and `DOS\3', for OFS and FFS
+  respectively), which handles these characters correctly. All previous
+  versions had national character case conversion *enabled*. It is now
+  *disabled* by default.
+
+- Fixed infinite-loop bug in delete command. (Dennis Vasko)
+
+- Fixed `-Y' option. Was broken in earlier versions.
+
+- Fixed `-y' option again to work the way it's supposed to. Previously it
+  would not work at all.
+
+- Fixed bug in level 2 header filenote handling. Previously it would emit
+  a filename exthdr twice instead of one filename+one filenote exthdr.
+  (Gunnar Klauberg)
+
+- The `-C' option (clear arc-bit on extract) is now set by default (as
+  the doc says). (forgot who reported this, sorry).
+
+- Added `-Qb' option to force LhA to test an archive before extracting
+  anything from it. If the test fails nothing is extracted.
+
+- Added safety check for delete command. The delete command must always
+  be specified with `d' only (not `delete' or `del' or anything else,
+  just `d'). (Klaus Weber).
+
+- LhA now maps foreign (MS-DOS) file attributes to Amiga attributes
+  if the files were archived with level 1 or 2 headers on the source
+  system.
+
+V1.31 : private release
+
+V1.30 : Apr 6 1992
+
+- Significantly faster -lh5- and -lh1- compression. (registered)
+
+- Fixed bug in level 1 header handling. Previously it would break 50% of
+  the time on machines with 68000 processors. (Mats Nyman)
+
+- Fixed xclose() bug. This would cause archives to disappear when the last
+  file had been deleted. (Ola Olsson)
+
+- Added new mode to `-x' option. In this mode the entire archived pathname
+  is used when writing the files to the output device (like with `-x1' or
+  `-x'), but not when selecting them (like with `-x0'). This mode is
+  selected by using `-x3'.
+
+- Added new mode to `-x' option. In this mode the entire archived pathname
+  is used when selecting files to extract (like with `-x1' or `-x'), but
+  not when writing the files to the output device (like with `-x0'). This
+  mode is selected by using `-x2'. (Magnus Holmgren)
+
+V1.23 : Apr 4 1992
+
+- Fixed compression I/O error detection on archive temporary device.
+
+- LhA now supresses requesters when looking for ENV: (Pavel Vána)
+
+V1.22 : Apr 2 1992
+
+- Fixed compression bug. Introduced in V1.20. Quite rare. (Mats Nyman)
+
+- Changed `-y' option behaviour. Now no longer appends `.lha' or `.lzh'
+  suffix if archive name already contains one (Thanks to Mats Nyman).
+
+- Fixed problem where LhA would not restore file attributes with level 0
+  headers even if you specified `-a' on extraction. (Thanks to Ken Krebs)
+
+V1.20 : Mar 26 1992
+
+- LhA now supports multivolume archives. On the evaluation version, only
+  extracting and listing of multivolume archives is allowed. Currently
+  the maximum number of volumes is 100 - if you go above this limit LhA
+  won't complain but the behaviour is undefined (a crash is very likely
+  to occur).
+
+- LhA now appends a lower-case `.lzh' or `.lha' instead of the upper-case
+  suffixes in earlier versions. (Purely cosmetic)
+
+- Added support for OS2.0 local variables. Local variables override the
+  global ENV:LHAOPTS if present.
+
+- Added `S' response to queries. Pressing `s' will cause LhA to assume
+  negative response to all following queries of the same class. (i.e.
+  generally skipping all following files).
+
+- Fixed bug in console font size detection on public screens other than
+  the WB.
+
+- Fixed problem with updating/deleting files in/from archives on another
+  device than the one the working directory is on.
+
+- LhA now reads default options from the environment variable LHAOPTS
+  unless the `-I' switch is specified before the archive name. Note that
+  the `-I' switch is special because it HAS to be specified directly
+  after a dash (`-') like in "LhA -I a ram:test *.h", and not like this:
+  "LhA -nI a ram:test *.h". You will get a warning message if LhA detects
+  this. Specifying the `-I' option within LHAOPTS is not a good idea..
+
+- Implemented `-H' switch. LhA can now write level 1 and level 2 headers.
+
+- Fixed disk full detection problem when extracting stored files. (Juha
+  Luoma).
+
+- LhA now emits no ANSI sequences at all when listing archives.
+  (A.J.Brouwer).
+
+- Added `q' modifier to `l' and `v' commands to allow for creation of
+  name-only archive listings. (Use `-N' option to suppress copyright
+  msg).  (Niklas Sjöberg)
+
+- Added `-Qd' option to make LhA ignore the delete protection file when
+  moving files. (Will delete the file regardless of the delete protection
+  flag state).
+
+- Added `-Qw' option to cause LhA to ignore wildcards. Useful when
+  processing files containing wildcard characters (`~[]()*#?%). (Paul van
+  der Heu).
+
+- LhA now can process SFX archives created with LhASFX. This means you can
+  use LhA to test uploaded SFX archives on a BBS without taking the risk
+  of running the `.RUN' file (which is dangerous since there's no way of
+  knowing if it actually is a SFX archive or some type of `bomb').
+
+- Changed command line parsing to enable user to archive entire volumes
+  or directories simply by specifying `df0:' and `dir/' as action file
+  specs if they are followed by another directory name or are last on the
+  command line. Idea from Pavel Vàña. See manual for more detailed
+  explanation.
+
+- Added '-e' option to archive empty subdirectories (only valid when used
+  together with '-r' option).
+
+- Added '-d' option to set archive file date to that of the newest file in
+  the archive.
+
+- Added '-K' option to remove empty directories when moving files with the
+  `m' command.
+
+- Changed console reset sequence once more to please some console
+  emulators.
+
+- Added `-y' option to force suffix append.
+
+- Added -lh4- compression switch (`-1') serves no real purpose but I added
+  it for the sake of completeness.
+
+- Fixed handling of level 2 headers. Would crash hard in earlier versions.
+
+- LhA now supports all extended header types.
+
+- All ARP dependencies removed. ARP is never used under KS2.x, but under
+  1.x ARP will be used if pattern.library does not exist. If neither ARP
+  nor pattern.library exists when running under KS1.x, LhA uses its
+  internal (inferior) pattern matching routines handling `?' and `*'
+  only.
+
+- Added replace (`r') command. Works like update command but replaces
+  files in archive regardless of datestamps. (Same effect as `u' command
+  with option `-Qr').
+
+- Added `-Qr' option. This option disables the datestamp comparison for
+  the `f' and `u' commands, so all files that exists in the archive will
+  be replaced regardless of file modification dates.
+
+- Fixed cosmetic problem when using the `-n' option with the add/update
+  commands. Would emit one linefeed for every present file in the
+  archive.
+
+- Added `-Qd' option to delete autoshow files after showing/extracting.
+
+- Rewrote the -lh1- encoding routines in assembler, now -lh1- compression
+  is about 1.6 times faster than before. (REGISTERED version only)
+
+- LhA now recognizes `.ZOM' files as being compressed and will not attempt
+  further compression. (Olaf Barthel)
+
+- Implemented `-h' option to disable the homedir facility. Useful when
+  running ToolManager, which passes directories as `dirname/'. (Oliver
+  Knorr).
+
+- Implemented `-Qo' option to disable options after the command. Useful
+  when running automated BBS file testing. (Suggested by Frederick Page)
+  When this option is enabled all options must be specified before the
+  command, like in LZ and LHArc.
+
+- Fixed bug in the automatic stack allocation code, which would cause LhA
+  to crash when run together with MungWall with a CLI stack size of less
+  than 6000 bytes. (Chris Green at CBM). The minimum stack size has also
+  been reduced to 4000 bytes.
+
+- Some central list handling routines rewritten in assembler to reduce
+  size.
+
+- When listing archives, LhA now prints years after 2000 in only two
+  digits (before it was displayed as 100 etc. ). Normally, files with
+  these dates have invalid datestamps.
+
+- The `p' command now no longer emit the in-between-file message or the
+  console reset sequence when the `-q' option is used. `-n' can be used
+  to suppress the in-between-file message alone. (Loren J. Rittle)
+
+- Fixed cosmetic `bug' caused by bug in KS1.3 console device. (Michael
+  Beer).
+
+- Fixed progress indicator type 2 & 3 bug. Earlier versions would die
+  when extracting zero-length files or empty directories with the `-D2'
+  or `-D3' options. Thanks to Camillo Särs for reporting.
+
+V1.11 : Jan 19 1992
+
+- Fixed packing progress indicator type 3 (-D3) glitch.
+
+- Fixed the last bug in compression. The compression ratio has also been
+  improved slightly over V1.10 (Thanks to Stefan Becker for reporting).
+
+- Fixed a few `bugs' in the manual.
+
+- Add operations now respect the -N option setting.
+
+- Add operations now respect the -F option setting.
+
+V1.10 : Jan 13 1992
+
+Major update; [all in a weeks work]
+
+- Bug in compression fixed, would show up mostly on large files, but had
+  nothing to do with the size of the file really. This bug only affected
+  LHA (-lh5-) compression. Because of the nature of this bugfix, the LHA
+  compression is now better than before - but the difference is very
+  slight.
+
+- Fixed rare bug in decompression code (several persons reported this and
+  the offending file had been hatched via ADS). Handling of corrupted
+  archives improved as well - V1.00 would crash on some bad data. This
+  release will never do so.
+
+- Bug fixed where LhA would report an error and leave the temporary
+  archive in the working directory. This happened when updating or
+  deleting files in an archive on the same device as the work directory.
+  Cause: DeleteFile in dos.library returns TRUE if delete was OK, and
+  FALSE otherwise, I thought it was the other way around. (That's what
+  you get for not reading the docs carefully enough).
+
+- Fixed stupid bug where LhA would refuse to do anything to delete-
+  protected files, even if you didn't want to write to the file.
+
+- Fixed minor problem where LhA poked outside allocated memory (allocated
+  2 bytes too little for two buffers), this had no real effect however as
+  the memory being stepped on never could get used by any other task
+  anyway. (thanks to Peer Hasselmeyer for discovering this bug with
+  MungWall).
+
+- Progress indicator update rate is now 4096 bytes in compression. Still
+  hardcoded however.
+
+- Fixed problem where some corrupted archives or too long level 2 headers
+  would cause LhA to crash. (Thanks to Jerry Sandstedt for reporting and
+  supplying an offending archive).
+
+- Fixed problem when arp.library could not be opened. Now exits cleanly
+  with a message and error return code.
+
+- LhA now reports already existing files (a and m commands) differently.
+  In previous versions the source file with the whole path was printed,
+  now LhA lists the name of the file as stored in the archive.
+
+- Recursive file collection changed somewhat, any explicit filespec will
+  now be looked for only in the current home directory, and not in all
+  scanned directories as before. If you want the old behaviour enclose the
+  name in parantheses. By explicit filespec I mean a filespec without any
+  wildcard characters.
+
+- If a directory name (without trailing `/' or `:') is specified as an
+  action file with (a,f,u,m) commands, it is translated to `dir/*'. i.e.
+  LhA will archive all files in that directory; if the `-r' option is
+  enabled (recursive file collection) all files in the directory and it's
+  subdirectories will be archived. Useful when using together with disk
+  utilities such as Browser, DirOpus etc. Note that you cannot use this
+  technique to archive an entire device/assigned directory, since LhA will
+  treat this as a home directory specification. In this case, 'device:*'
+  or `device:#?' must be used.
+
+- Archive attributes are no longer set to ----rw-d by default, on request
+  from WB users. It can still be switched on with the -A switch however.
+
+- When attribute preservation is off, LhA now sets the attribute field on
+  added files to --p-rwed (0x20) for MS-DOS compatibility.
+
+- Attributes are no longer preserved by default on extract commands. The
+  archive update commands (a,f,u,m) still preserve attributes by default
+  however.
+
+- Changed `vv' command, now all fields are OK.
+
+- LhA now emits a warning if the first action file specification is an
+  explicit (no wildcards) name and the file does not exist. No error code
+  is returned to the shell.
+
+- LhA now returns an error code when no archive matches the archive spec.
+
+- Fixed bug where LhA would print the wrong byte count for certain failed
+  memory allocations. Purely cosmetic.
+
+- Worked around problem (bug?) in arp.library pattern matching routines.
+  A pattern such as #> would cause memory corruption in prior versions of
+  LhA. Although the arp documentation states that PreParse() will never
+  produce parsed strings longer than the original, it sometimes does.
+  (Thanks to Gary Chapman for reporting this problem)
+
+- Printout fixed for extraction with `-t' and `-T' options, now only
+  prints the names of the files that were actually extracted.
+
+- Re-enabling of cursor changed to make certain console emulators happy.
+  (Thanks to A.J.Brouwer)
+
+- Recursive file collection fixed. No longer scans unnecessary directories
+  when explicit filespecs are given.
+
+- Files with names beginning with a dash (`-') can now be specified on
+  the command line by using double-dashes (`--') as stated in the
+  manual.
+
+- Files beginning with an at-sign (`@') can now be specified by using
+  double at-signs.
+
+- Manual tidied up and corrected to treat the evaluation version only. No
+  more references to registered-user-only options, commands or programs.
+
+- LhA now supports LhArc-style autoshow files. Autoshow files are files
+  with names ending in `.displayme' (case insignificant).
+
+- Option (`-M') added for disabling of autoshow files. Autoshow files are
+  disabled by default when the `-m' option is used.
+
+- LhA now promptly aborts with an error condition if a file cannot be
+  opened for archiving. (Thanks to Magnus Holmgren for reporting this
+  problem).
+
+- `Warning: premature end of file, no archive terminator seen' message
+  removed, since many people thought this was a bug with LhA. Served no
+  real purpose anyway.
+
+- Freshen command implemented.
+
+- LhA now restores empty subdirectories as created by AmigaDOS LhArc 1.30
+  (with `-re' option) does not yet archive them however.
+
+- LhA extract commands now accept a destination-directory specification
+  anywhere on the command line.
+
+- LhA now deletes temporary archives from the working directory when an
+  update or freshen operation is interrupted.
+__________________________________________________________________________
+==========================================================================
+
+V1.00 : Released Dec 20 1991
+
+- First public release

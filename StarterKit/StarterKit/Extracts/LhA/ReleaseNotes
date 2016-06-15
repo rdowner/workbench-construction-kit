@@ -1,0 +1,65 @@
+__________________________________________________________________________
+==========================================================================
+
+                       Release notes for LhA V1.38
+
+                 Copyright (c) 1991,92 By Stefan Boberg
+
+                           Released 29-Aug-92
+
+__________________________________________________________________________
+==========================================================================
+
+  Originally I did not intend to release any version of LhA publically
+until V2.00, but since there were a few bugs in V1.32e I decided to
+release this cleaned-up and hopefully bug-free version. It's based on
+the old (pre-V2.xx) source code and no new features have been added since
+V1.35 - the only changes are bugfixes.
+
+  All changes are described in `update.txt'. The most important are:
+
+ - Handling of `~', `[' and `]' wildcards now work in non-international
+   character translation mode.
+
+ - Security measures to prevent `s:startup-sequence'-type hacks
+   implemented.
+
+ - Bug fixed in handling of multivolume archives in evaluation version.
+
+ - The suppressed-system-requester bug has been fixed.
+
+ - Now respects -x option setting at all times.
+
+ - The `-s' option now works as advertised. Somehow this never got
+   implemented (actually I thought I had done it but since I don't use
+   it myself I never noticed until a bug report arrived).
+
+ - Added `y', `h' and `c' commands. See manual for details.
+
+ - Quick-add mode
+
+ - LhA now enables `*' wildcard for OS2.x - no need for WildStar type
+   programs anymore.
+
+  That's about it. All the fancy new stuff is in V2.xx and as the program
+has been almost entirely rewritten none of it is present in this interim
+release. This is mainly a bugfix release. Boring - but that's life.
+
+  Enjoy,
+          Stefan
+__________________________________________________________________________
+==========================================================================
+
+                 `` Please allow 2-8 weeks for delivery ,,
+
+ During spring/early summer 1992 I could not deliver on time to everybody,
+ so this time frame was exceeded. I have sent off most registrations
+ during this summer however, so now I have more time and should be able to
+ ship within a week after the order has arrived at my place. My sincere
+ apologies to those who had to wait a VERY long time for their copy to
+ arrive. I'm working hard on improving this program and the support and
+ distribution for the next release (V2.00). Read the `Future.txt' file for
+ more info. LhA would never have been what it is now without your support.
+ Thank You!
+__________________________________________________________________________
+==========================================================================

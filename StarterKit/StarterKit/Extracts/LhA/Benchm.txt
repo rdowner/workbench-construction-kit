@@ -1,0 +1,163 @@
+================================================================
+
+Benchmarks:   [ See bottom for specifications and comments]
+-----------
+
+DLGMSGS.txt - various BBS msgs.     Original: 1991842 bytes
+
+                           Time comp  Time decmp Size comp
+                           ---------  ---------- ---------
+LhA V2.00 alpha   -lh6-      36           3.2       690311 *NOTE
+LhA V2.00 alpha   -lh7-      52           6.5       584930 *NOTE
+PKZip V1.93a -mx  deflate   ***i486 System***       631780
+Zoo V2.01          LZC       44          15.0      1098202
+LhA V1.31r -v9Qh64 -lh5-     47           7.9       721426 (030)
+LhA V1.38r -v9Qh64 -lh5-     49           7.9       721426
+LhA V1.30r -v0Qh64 -lh5-     50           7.9       721116 (030)
+LhA V1.30r -Qh64   -lh4-     50           7.9       775953
+LhA V1.38r -v0Qh64 -lh5-     52           7.9       721116
+LhA V1.30r -Qh64   -lh5-     54           7.9       721118
+LhA V1.38e -v0Qh64 -lh5-     70           7.9       721116 (eval)
+Zoo V2.10          LZC      123          49.2      1098202
+LZ V1.92          -lh1-     164          34.2       779766
+Shrink 1.01b      Mode4     203         215.7       735193
+Shrink 1.01b      Mode7     207         164.3       597354
+LZ V1.92          -lh5-     210          15.9       724599
+LhArc V1.30       -lh1-     298          56.6       807094
+Zoo V2.10          ah       310          35.8       725072
+Portable lha 0.04 -lh5-     370          35.0       725070
+HPack 0.75beta              440         195         637389
+
+*NOTE: LhA V2.00 alpha is only a experimental version of
+       LhA V2.00. It is not optimized and compression
+       performance/speed may be better or worse in the
+       final version depending on various implementation
+       decisions. The -lh6- in particular may be changed
+       or scrapped entirely.
+
+================================================================
+
+Calgary corpus - 3.2MB of text, binary and graphics data
+                 in 21 files.
+
+                          Time comp Time decmp Size comp
+                          --------- ---------- ---------
+Zoo V2.01         LZC       61         23.9      1491922
+LhA V1.31 -v9Qh64 lh5       90         12.9      1141866  (030)
+StuffIt 1.6      `Fast'    106         70.3      1415364
+LhA V1.30 -Qh64  -lh4-     111         12.9      1186291  (reg)
+LhA V1.31 -Qh64  -lh5-     115         12.9      1137191  (030)
+LhA V1.30        -lh1-     116         36.0      1199680  (reg)
+LhA V1.30 -Qh64  -lh5-     122         12.9      1136244  (reg)
+LhA V1.30        -lh5-     124         12.9      1139622  (reg)
+LhA V1.11 -Qh64  -lh5-     174         12.9      1136244  (eval)
+LhA V1.11        -lh5-     175         12.9      1139622  (eval)
+LhA V1.11        -lh1-     189         36.0      1199680  (eval)
+LhA V1.31 -v0Qh64 lh5      227         12.9      1136496  (030)
+CompactPro 1.31   .CPT     232         78.1      1181639
+LZ V1.92         -lh1-     263         51.2      1199209
+Shrink 1.01b     Mode4     366        337.4      1152168
+LZ V1.92         -lh5-     383         27.0      1139178
+PkAZip V1.02      imp      386         45.0      1196698
+Shrink 1.01b     Mode1     398        458.1      1342598
+Zoo V2.10         ah       508         57.5      1140114
+Shrink 1.01b     Mode7     568                   1043854
+StuffIt 1.6   `Best Guess' 654        113.0      1253526
+StuffIt 1.6     `Better'   905        113.0      1253526
+Zoo V2.10         LZC      ---         76.1      1491922
+Pkax V1.0       crunch     ---         51.1      -------
+HPack 0.75beta            5422 (!)    364        1048326
+                            ^
+                            |
+Most of the time spent on one single file (pic = gfx data).
+
+================================================================
+
+Backup of my SRC: directory, contains various sources (mostly C)
+and binaries. Archive on Quantum 120LPS.
+
+(-lh5- compression)
+
+Listing of archive 'dl:test.lha':
+Original  Packed Ratio    Date     Time    Name
+-------- ------- ----- --------- --------  -------------
+<...>
+-----------------------------------------
+16323405 8466106 48.1% 02-Apr-92 13:09:18   2094 files
+
+Archive test times (in seconds)
+
+LhA V1.22        86
+LZ V1.92        362
+
+================================================================
+
+Backup of my C2: directory, containing various binaries. Also on
+Quantum 120LPS.
+
+(-lh5- compression)
+
+Listing of archive 'dl:test.lha':
+Original  Packed Ratio    Date     Time    Name
+-------- ------- ----- --------- --------  -------------
+<...>
+-------- ------- ----- --------- --------
+ 8094050 5244699 35.2% 02-Apr-92 13:36:10   450 files
+
+Archive test times (in seconds)
+
+LhA V1.22        49
+LZ V1.92        162
+
+================================================================
+
+Times are for A3000/25 (8M fast, 2M chip) with all files in RAM:
+loading times are not included. No tasks were running in the
+background except for the inavoidable DOS processes + workbench.
+To avoid memory fragmentation the machine was rebooted before
+each benchmark. Operating system is KickStart V2.04. Data and
+instruction caches+burst mode were on.
+
+All times are in seconds, and sizes in bytes. Default settings
+used unless specified. Entries are sorted by compression time.
+Extract time is without disk access (actually it's the TEST
+time). All console output suppressed in all tests.
+
+The portable LHa and HPack were compiled with GCC 2.0, with
+`-O2 -fstrength-reduce -ffomit-frame-pointer -m68030' as
+optimization flags. Some functions were made inline to improve
+speed.
+
+`Shrink' was included mainly to show that order-0 arithmetic
+coding doesn't give you any major improvements compression-
+wise. Shrink in compression mode 4 uses the same dictionary
+size as LhA in -lh5- mode, but uses order-0 arithmetic encoding
+instead of adaptive Huffman coding, and as you can see the
+result is worse than LhA. The *big* disadvantage of arithmetic
+coding can be seen in the decompression time column.. The reason
+why Mode7 is so much better than LhA in most cases is that the
+dictionary is 8 times as big as LhA's in that mode.
+
+The Mac programs were included to see how LhA compares to the
+best archivers for another Platform. CompactPro and StuffIt
+Classic were run under System 6.5.1 on the same A3000/25 as all
+Amiga programs (using A-Max II+). As you can see, LhA out-
+performs both quite easily. Seems those Mac guys aren't too
+good at optimizing :-) Especially decompression is slow on the
+Mac archivers. `MacLHa V2.0' wasn't included in the test because
+it is *SO* slow I just couldn't stand it - wonder how on earth
+the porter managed to get it that slow, since LhA is more than
+10 times faster.
+
+================================================================
+
+This benchmark is by no means complete, it's only meant to give
+you an idea how LhA compares with other more or less common
+archivers.
+
+When I get the time I will perform a larger test with more
+varying files.
+
+                                                       / Stefan
+
+================================================================
