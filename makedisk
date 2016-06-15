@@ -87,6 +87,15 @@ elif [ -d "${SCRIPTDIR}/StarterKit" ]; then
     xdftool part=1 + write StarterKit /
 fi
 
+# Install keyfiles
+for keyfile in Miami/Miami.key1 Miami/Miami.key2; do
+    kf="${SCRIPTDIR}/licensed/${keyfile}"
+    echo "Checking for ${kf}"
+    if [ -f "${kf}" ]; then
+        xdftool part=1 + write "${kf}" "StarterKit/Keyfiles/$( basename "${keyfile}" )"
+    fi
+done
+
 # Final output
 rdbtool info
 echo Workbench:
