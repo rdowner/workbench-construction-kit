@@ -96,6 +96,11 @@ for keyfile in Miami/Miami.key1 Miami/Miami.key2; do
     fi
 done
 
+# Install Amiga Explorer
+if [ -d "${SCRIPTDIR}/licensed/AmigaExplorer" ]; then
+    xdftool part=1 + write "${SCRIPTDIR}/licensed/AmigaExplorer" "StarterKit/Extracts"
+fi
+
 # Final output
 rdbtool info
 echo Workbench:

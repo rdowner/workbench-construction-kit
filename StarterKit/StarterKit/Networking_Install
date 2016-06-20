@@ -50,6 +50,11 @@
 (copyfiles (source (tackon #resources "Start-Miami")) (dest "S:") (infos))
 (set #userstartup "Execute S:Start-Miami")
 
+(if (exists (tackon #extracts "AmigaExplorer")) (
+    (copyfiles (source (tackon (tackon #extracts "AmigaExplorer") "AExplorer")) (dest "SYS:Utilities") (infos))
+    (set #userstartup (cat #userstartup "\n" "Run >NIL: <NIL: AExplorer >NIL: <NIL: CONNECTION TCP/IP QUIET"))
+))
+
 (startup "StarterKit_Networking_Install"
     (command #userstartup)
     (prompt "Starts Miami and AmigaExplorer on boot")
