@@ -4,7 +4,7 @@
         (if (= 0 mustmakedir)
             (set #t_destdir #extracts)
             (
-                (set #t_destdir (tackon #extracts extractdir))
+                (set #t_destdir (tackon #extracts checkdir))
                 (if (= 0 (exists #t_destdir)) (makedir #t_destdir (infos)))
             )
         )
@@ -35,6 +35,8 @@
 (P_extract_lha "Miami GTLayout" "Miami32b-GTL.lha" "miami32b_install/gtlayout" 0)
 (set #miamivariant (if (>= (database "cpu") 68020) ("020") ("000")))
 (P_extract_lha "Miami Executable" ("Miami32b-%s.lha" #miamivariant) ("miami32b_install/%s" #miamivariant) 0)
+(P_extract_lha "A2065 Ethernet Driver" "a2065v216a.lha" "A2065" 1)
+(P_extract_lha "CNet Ethernet Driver" "cnetdevice-1.9.lha" "cnetdevice" 0)
 
 (if (= 0 (exists "MIAMI:" (noreq)))
     (
@@ -46,6 +48,14 @@
 
 (if (exists (tackon #keyfiles "Miami.key1")) (copyfiles (source (tackon #keyfiles "Miami.key1")) (dest "MIAMI:")))
 (if (exists (tackon #keyfiles "Miami.key2")) (copyfiles (source (tackon #keyfiles "Miami.key2")) (dest "MIAMI:")))
+
+(if (= 0 (exists "DEVS:Networks")) (makedir "DEVS:Networks" (infos)))
+(copyfiles (source (tackon (tackon #extracts "A2065") "a2065.device")) (dest "DEVS:Networks") (infos))
+(copyfiles
+    (source (tackon (tackon (tackon (tackon #extracts "cnetdevice") "devs") "networks") "cnet.device"))
+    (dest "DEVS:Networks")
+    (infos)
+)
 
 (copyfiles (source (tackon #resources "Start-Miami")) (dest "S:") (infos))
 (set #userstartup "Execute S:Start-Miami")

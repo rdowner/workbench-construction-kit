@@ -10,4 +10,6 @@ The files in this directory were obtained from the following public locations:
   * Miami32b-GTL.lha
   * Miami32b-MUI.lha
   * Miami32b2-main.lha
+* a2065v216a.lha: http://aminet.net/package/driver/net/a2065v216a
+* cnetdevice-1.9.lha: http://www.g-mb.de/cnet/index_e.html
 
