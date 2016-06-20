@@ -1,0 +1,13 @@
+Sources
+-------
+
+The files in this directory were obtained from the following public locations:
+
+* Miami: Aminet
+  * Miami32b-000.lha
+  * Miami32b-020.lha
+  * Miami32b-CA.lha
+  * Miami32b-GTL.lha
+  * Miami32b-MUI.lha
+  * Miami32b2-main.lha
+
