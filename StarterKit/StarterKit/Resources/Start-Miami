@@ -1,0 +1,5 @@
+Assign MIAMI: SYS:System/Miami
+Run <>NIL: MIAMI:Miami NOGUI
+WaitForPort MIAMI.1
+Rx "ADDRESS MIAMI.1; ONLINE"
+

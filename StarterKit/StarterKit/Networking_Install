@@ -22,12 +22,13 @@
     (abort "Please use Install version 43 or later.")
 )
 
-(welcome)
+(welcome "This installer will prepare your Amiga for the installation of Miami 3.2b, and install some supplemental applications and utilities. After this installer completes, you should run the official Miami installer, then configure Miami.")
 
 (set #basedir "Work:StarterKit")
 (set #archives (tackon #basedir "Archives"))
 (set #extracts (tackon #basedir "Extracts"))
 (set #keyfiles (tackon #basedir "Keyfiles"))
+(set #resources (tackon #basedir "Resources"))
 (set #lha (tackon (tackon #extracts "LhA") "LhA"))
 
 (P_extract_lha "Miami Core" "Miami32b2-main.lha" "miami32b_install" 0)
@@ -46,7 +47,22 @@
 (if (exists (tackon #keyfiles "Miami.key1")) (copyfiles (source (tackon #keyfiles "Miami.key1")) (dest "MIAMI:")))
 (if (exists (tackon #keyfiles "Miami.key2")) (copyfiles (source (tackon #keyfiles "Miami.key2")) (dest "MIAMI:")))
 
-(message (cat "I've set up as much as I can. You can now run the Miami installer located at " (tackon #extracts "Miami32b_Install")))
+(copyfiles (source (tackon #resources "Start-Miami")) (dest "S:") (infos))
+(set #userstartup "Execute S:Start-Miami")
+
+(startup "StarterKit_Networking_Install"
+    (command #userstartup)
+    (prompt "Starts Miami and AmigaExplorer on boot")
+    (help "Starts Miami and AmigaExplorer on boot")
+)
+
+(exit (cat
+    "I've set up as much as I can. You can now run the Miami installer located at "
+    (tackon #extracts "Miami32b_Install")
+    ". After Miami is installed, open the Miami drawer in the Workbench System drawer. "
+    "Run MiamiInit, and then start Miami and import the MiamiInit configuration. "
+    "Now Miami should successfully start and go online on every boot."
+))
 
 ; Couldn't get this to work. Saving it for later...
 ; (message "I'm going to start the Miami installer now. Once it is complete you will return back to this installer.")
