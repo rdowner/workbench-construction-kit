@@ -1,0 +1,39 @@
+(procedure P_extract_lha nicename arcname checkdir mustmakedir
+    (if (= 0 (exists (tackon #extracts checkdir))) (
+        (working (cat "Extracting " nicename " archive"))
+        (if (= 0 mustmakedir)
+            (set #t_destdir #extracts)
+            (
+                (set #t_destdir (tackon #extracts extractdir))
+                (if (= 0 (exists #t_destdir)) (makedir #t_destdir (infos)))
+            )
+        )
+        (set #t_lhacmd (cat #lha " x " (tackon #archives arcname) " " #t_destdir "/"))
+        (set #t_rc
+            (run #t_lhacmd
+                (prompt (cat "p_Extract " nicename " using LhA command " #t_lhacmd))
+                (help (cat "h_Extract " nicename " using LhA command " #t_lhacmd))
+            ))
+        (if (< 0 #t_rc) (abort (cat "LhA command was unsuccessful: " #t_lhacmd)))
+    ))
+)
+
+(if (< (/ @installer-version 65536) 43)
+    (abort "Please use Install version 43 or later.")
+)
+
+(welcome)
+
+(set #basedir "Work:StarterKit")
+(set #archives (tackon #basedir "Archives"))
+(set #extracts (tackon #basedir "Extracts"))
+(set #lha (tackon (tackon #extracts "LhA") "LhA"))
+
+(P_extract_lha "GTLayout" "gtlayout.lha" "GTLayout" 1)
+(set #gtlayoutvariant (if (>= (database "cpu") 68020) ("gtlayout.library.020") ("gtlayout.library.68k")))
+(copylib
+    (source (tackon (tackon (tackon #extracts "GTLayout") "libs") #gtlayoutvariant))
+    (dest "LIBS:")
+    (newname "gtlayout.library")
+)
+
