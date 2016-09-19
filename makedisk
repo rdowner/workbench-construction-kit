@@ -3,7 +3,7 @@
 SCRIPTDIR="$( cd $( dirname $0 ) && pwd )"
 [ -z "${SCRIPTDIR}" ] && { echo >&2 Could not identify script location; exit 1; }
 [ -d "${SCRIPTDIR}" ] || { echo >&2 Could not identify script location; exit 1; }
-WORKDIR="${SCRIPTDIR}/work"
+WORKDIR="${TMPDIR:-/tmp}/$( basename "$0" )"
 mkdir -p "${WORKDIR}"
 
 AMITOOLS="/Users/richard/Dropbox/Personal/Amiga/amitools"
