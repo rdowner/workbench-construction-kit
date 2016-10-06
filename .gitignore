@@ -10,3 +10,14 @@ Session.vim
 *~
 # auto-generated tag files
 tags
+
+# from bundle gem skeleton
+/.bundle/
+/.yardoc
+/Gemfile.lock
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
