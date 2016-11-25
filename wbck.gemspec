@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Richard Downer"]
   spec.email         = ["richard@apache.org"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = %q{The Workbench Construction Kit is a tool for creating an Amiga operating system image with lots of useful software.}
+  spec.description   = %q{The Workbench Construction Kit is a tool for creating an Amiga operating system image with lots of useful software, but which leaves it up to you to decide what you want to install. It's opinionated at the micro level (for example, if you install a TCP/IP stack you will automatically get drivers for common NICs) but not at the macro level (it's up to you to decide if you want to install a TCP/IP stack or not). This means that you can get your Amiga configured with the software you prefer without having to answer hundreds of questions of minutia.}
+  spec.homepage      = "https://github.com/rdowner/workbench-construction-kit"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
@@ -31,5 +31,8 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.13"
   spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "rspec", "~> 3.2"
+
+  spec.add_dependency "thor"
+  spec.add_dependency "paint"
 end

@@ -1,0 +1,2 @@
+module Wbck::Util
+end
