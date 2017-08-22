@@ -6,8 +6,8 @@ module Wbck::Module
   class Partition
     def run(context)
 
-      geom = Wbck::Util::Geometry.new(context.global_config['geometry'])
-      filename = context.global_config['filename']
+      geom = context.global_config.geometry
+      filename = context.global_config.filename
       rdb_reserve = context.module_config['rdb_reserve'].to_i
       partitions = context.module_config['partitions']
 
