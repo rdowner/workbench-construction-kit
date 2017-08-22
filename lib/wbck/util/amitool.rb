@@ -13,6 +13,19 @@ module Wbck::Util
       amitool('rdbtool', c)
     end
 
+    def rdbtool_create(commands)
+      c = commands.clone
+      c.insert(0, Command.new('create', [], { 'c' => @geometry.cylinders, 'h' => @geometry.heads, 's' => @geometry.sectors }))
+      amitool('rdbtool', c)
+    end
+
+    def rdbtool_create_or_open(commands)
+      c = commands.clone
+      cmd = File.exist?(@image) ? 'open' : 'create'
+      c.insert(0, Command.new(cmd, [], {'c' => @geometry.cylinders, 'h' => @geometry.heads, 's' => @geometry.sectors }))
+      amitool('rdbtool', c)
+    end
+
     def xdftool(partition, commands)
       c = commands.clone
       c.insert(0, Command.new('open', [], { 'c' => @geometry.cylinders, 'h' => @geometry.heads, 's' => @geometry.sectors, 'part' => partition }))

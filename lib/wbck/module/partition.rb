@@ -30,7 +30,7 @@ module Wbck::Module
       end
 
       puts Paint['Initialising RDB with ', :blue] + Paint[rdb_reserve, :magenta] + Paint[' cylinders', :blue]
-      context.amitool.rdbtool([
+      context.amitool.rdbtool_create_or_open([
                                 Wbck::Util::Amitool::Command.new('init', [], {'rdb_cyls' => rdb_reserve.to_s})
                               ])
 
