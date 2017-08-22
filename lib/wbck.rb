@@ -20,10 +20,19 @@ module Wbck
         exit 1
       end
 
-      config['modules'].each do |m|
-        puts Paint["Processing: #{m['module']}", :green]
-        context = Wbck::Context.new(config['global'], m, Wbck::Util::ShellExecutor.new())
-        m['ref'].run(context)
+      workspace = Dir.mktmpdir('wbck-')
+      begin
+        puts Paint["Use #{workspace} for workspace", :green]
+
+        config['modules'].each do |m|
+          puts Paint["Processing: #{m['module']}", :green]
+          context = Wbck::Context.new(config['global'], m, Wbck::Util::ShellExecutor.new(), workspace)
+          m['ref'].run(context)
+        end
+
+      ensure
+        puts Paint["Cleaning workspace", :green]
+        FileUtils.remove_entry(workspace)
       end
 
       puts Paint['Done!', :green, :bright]
