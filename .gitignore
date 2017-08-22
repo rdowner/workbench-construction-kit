@@ -1,4 +1,6 @@
 work
+.idea
+*.iml
 
 # swap
 [._]*.s[a-w][a-z]
