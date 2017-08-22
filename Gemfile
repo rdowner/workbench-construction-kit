@@ -1,4 +1,4 @@
-#ruby=ruby-2.3.1
+#ruby=ruby-2.4.1
 #ruby-gemset=wbck
 
 source 'https://rubygems.org'
