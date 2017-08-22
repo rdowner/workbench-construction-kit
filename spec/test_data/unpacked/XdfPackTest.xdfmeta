@@ -1,0 +1,6 @@
+XdfPackTest:DOS0,22.08.2009 11:14:40 t28,22.08.2009 12:16:43 t21,22.08.2009 12:14:15 t32
+Disk.info:rwd,22.08.2009 12:14:15 t32,
+Subdirectory:rwed,22.08.2009 12:16:42 t22,
+Subdirectory.info:rwd,22.08.2009 12:14:00 t22,
+Subdirectory/File:rwd,22.08.2009 12:16:21 t15,
+Subdirectory/File.info:rwd,22.08.2009 12:16:42 t44,
