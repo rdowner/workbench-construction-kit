@@ -13,9 +13,9 @@ module Wbck::Util
 
     def initialize(path)
       raise ArgumentError, 'No such directory: ' + path unless Dir.exist?(path)
-      metafile = path + ".xdfmeta"
-      raise ArgumentError, 'No such file: ' + metafile unless File.exist?(path)
-      metadata = File.readlines(metafile)
+      @metafile = path + ".xdfmeta"
+      raise ArgumentError, 'No such file: ' + @metafile unless File.exist?(path)
+      metadata = File.readlines(@metafile)
       @metadata = XdfMeta.new(metadata)
       @unpacked_location = path
     end
@@ -59,6 +59,16 @@ module Wbck::Util
         end
         @metadata.add_file(f)
       end
+      flush
+    end
+
+    def flush
+      File.open(@metafile, 'w') do |f|
+        f.puts @metadata.to_s
+        all_content.each do |l|
+          f.puts l.to_s
+        end
+      end
     end
 
     def to_real_file(filename)
@@ -98,6 +108,10 @@ module Wbck::Util
         @all_content.push(metadata.clone)
       end
 
+      def to_s
+        sprintf '%s:%s,%s,%s,%s', @disk_name, @dos_type, @format_timestamp, @changed_timestamp, @rootblock_changed_timestamp
+      end
+
       class XdfItemMeta
 
         attr_reader :name, :flags, :timestamp, :comment
@@ -109,6 +123,10 @@ module Wbck::Util
           @flags = match[2]
           @timestamp = match[3]
           @comment = match[4]
+        end
+
+        def to_s
+          sprintf '%s:%s,%s,%s', @name, @flags, @timestamp, @comment
         end
 
       end
