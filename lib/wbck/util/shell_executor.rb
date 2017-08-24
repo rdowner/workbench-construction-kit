@@ -5,7 +5,10 @@ module Wbck::Util
 
     def execute(command)
       puts Paint['Executing: ', :blue] + Paint[command.join(' '), :magenta]
-      system(*command)
+      success = system(*command)
+      unless success
+        raise StandardError, "Shell command failed; #{$?}. Command: #{command}. Directory: #{Dir.getwd}"
+      end
     end
 
   end
