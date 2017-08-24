@@ -44,6 +44,10 @@ module Wbck::Util
       @metadata.all_content
     end
 
+    def find_file(filename)
+      all_content.find { |x| filename.casecmp(x.name) == 0 }
+    end
+
     def copy_in(other)
       other.all_content.each do |f|
         src = other.to_real_file(f.name)
