@@ -66,6 +66,22 @@ module Wbck::Util
       flush
     end
 
+    def install_file(localname, amiganame)
+      # FIXME fix case of directory names
+      existing = find_file amiganame
+      if existing
+        # FIXME: backup existing file
+        FileUtils.remove to_real_file(existing.name)
+        @metadata.remove_file(existing.name)
+      end
+
+      ts = Time.now.getlocal # TODO get from source file
+      metadata = XdfMeta::XdfItemMeta.new(sprintf('%s:%s,%s,%s', amiganame, 'rwed', amitool_ts(ts), '')) # TODO better constructor
+      FileUtils.cp(localname, to_real_file(amiganame))
+      @metadata.add_file(metadata)
+      flush
+    end
+
     def flush
       File.open(@metafile, 'w') do |f|
         f.puts @metadata.to_s
@@ -73,6 +89,11 @@ module Wbck::Util
           f.puts l.to_s
         end
       end
+    end
+
+    TS_FORMAT = '%d.%m.%Y %H:%M:%S'
+    def amitool_ts(ts)
+      ts.strftime(TS_FORMAT) + sprintf(' t%02d', ts.subsec)
     end
 
     def to_real_file(filename)
@@ -110,6 +131,10 @@ module Wbck::Util
 
       def add_file(metadata)
         @all_content.push(metadata.clone)
+      end
+
+      def remove_file(name)
+        @all_content.delete_if do |x| name.casecmp(x.name) == 0 end
       end
 
       def to_s
