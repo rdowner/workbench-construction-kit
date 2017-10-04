@@ -67,16 +67,31 @@ module Wbck::Util
     end
 
     def install_file(localname, amiganame)
-      # FIXME fix case of directory names
+      dirpart = amiganame.split('/')[0..-2].join('/')
+      unless dirpart.nil? || dirpart.length == 0
+        # Find the existing directory name - this causes the existing casing to be used
+        # (remember Amiga fs is not case sensitive but does store case, whereas the UNIX fs will be case sensitive,
+        # so while we're working on it we have to put files into exactly-correct cased directories)
+        dirpart_meta = find_file dirpart
+        if dirpart_meta.nil?
+          raise RuntimeError, "request to install file as #{amiganame} but directory #{dirpart} does not exist"
+        end
+        amiganame = dirpart_meta.name + '/' + amiganame.split('/')[-1]
+      end
+
       existing = find_file amiganame
       if existing
-        # FIXME: backup existing file
         FileUtils.remove to_real_file(existing.name)
         @metadata.remove_file(existing.name)
       end
 
-      ts = Time.now.getlocal # TODO get from source file
-      metadata = XdfMeta::XdfItemMeta.new(sprintf('%s:%s,%s,%s', amiganame, 'rwed', amitool_ts(ts), '')) # TODO better constructor
+      ts = File.mtime(localname)
+      mode = ''
+      mode += 'r' if File.readable?(localname)
+      mode += 'w' if File.writable?(localname)
+      mode += 'e' if File.executable?(localname)
+      mode += 'd' if File.writable?(localname)
+      metadata = XdfMeta::XdfItemMeta.new(sprintf('%s:%s,%s,%s', amiganame, mode, amitool_ts(ts), '')) # TODO better constructor
       FileUtils.cp(localname, to_real_file(amiganame))
       @metadata.add_file(metadata)
       flush

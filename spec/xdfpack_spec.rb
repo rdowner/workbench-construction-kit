@@ -2,11 +2,40 @@ require 'spec_helper'
 require 'wbck/context'
 require 'wbck/util/shell_executor'
 require 'wbck/util/xdf_pack'
+require 'pathname'
+require 'time'
 
 TEST_DATA_LOCATION = File.join(Dir.getwd, 'spec', 'test_data')
 UNPACKED_LOCATION = File.join(TEST_DATA_LOCATION, 'unpacked', 'XdfPackTest')
 PACKED_FILE = File.join(TEST_DATA_LOCATION, 'XdfPackTest.adf')
 ANOTHER_PACKED_FILE = File.join(TEST_DATA_LOCATION, 'Another.adf')
+
+def standard_context()
+  Dir.mktmpdir() do |workspace|
+    global_config = {'filename' => '/dev/null', 'geometry' => '7751/16/63'}
+    context = Wbck::Context.new(global_config, nil, Wbck::Util::ShellExecutor.new(), workspace)
+    pack = Wbck::Util::XdfPack.unpack(context, 'test', PACKED_FILE)
+    yield workspace, global_config, context, pack
+  end
+end
+
+def standard_install_file_context()
+  standard_context do |workspace, global_config, context, pack|
+    source_file = Pathname.new(workspace).join('install_file')
+    File.open(source_file, 'w') {|f| f.write("example file being imported")}
+    yield workspace, global_config, context, pack, source_file
+  end
+end
+
+def install_file_permission_test(unixmode, amigamode)
+  standard_install_file_context do |workspace, global_config, context, pack, source_file|
+    File.chmod(unixmode, source_file)
+    pack.install_file source_file, 'install_file'
+    imported_file_meta = pack.find_file('install_file')
+    expect(imported_file_meta).to_not(be_nil)
+    expect(imported_file_meta.flags).to eq(amigamode)
+  end
+end
 
 describe Wbck::Util::XdfPack do
 
@@ -52,10 +81,7 @@ describe Wbck::Util::XdfPack do
   end
 
   it "can unpack an xdf file" do
-    Dir.mktmpdir() do |workspace|
-      global_config = {'filename' => '/dev/null', 'geometry' => '7751/16/63'}
-      context = Wbck::Context.new(global_config, nil, Wbck::Util::ShellExecutor.new(), workspace)
-      pack = Wbck::Util::XdfPack.unpack(context, 'test', PACKED_FILE)
+    standard_context do |workspace, global_config, context, pack|
       expect(pack.disk_name).to eq('XdfPackTest')
       expect(pack.dos_type).to eq('DOS0')
       expect(pack.all_content.size).to eq(5)
@@ -68,10 +94,7 @@ describe Wbck::Util::XdfPack do
   end
 
   it "can copy in an xdf_pack" do
-    Dir.mktmpdir() do |workspace|
-      global_config = {'filename' => '/dev/null', 'geometry' => '7751/16/63'}
-      context = Wbck::Context.new(global_config, nil, Wbck::Util::ShellExecutor.new(), workspace)
-      pack = Wbck::Util::XdfPack.unpack(context, 'test', PACKED_FILE)
+    standard_context do |workspace, global_config, context, pack|
       other = Wbck::Util::XdfPack.unpack(context, 'other', ANOTHER_PACKED_FILE)
       pack.copy_in(other)
       expect(pack.all_content.size).to eq(6)
@@ -86,4 +109,64 @@ describe Wbck::Util::XdfPack do
     end
   end
 
+
+  it "can import a file into the root" do
+    standard_install_file_context do |workspace, global_config, context, pack, source_file|
+      pack.install_file source_file, 'install_file'
+      imported_file_meta = pack.find_file('install_file')
+      expect(imported_file_meta).to_not(be_nil)
+      fn = [workspace, 'test'] + imported_file_meta.name.split('/')
+      expect(File.exist?(File.join(*fn)))
+      File.open(File.join(*fn), 'r') {|f| expect(f.read).to eq("example file being imported") }
+    end
+  end
+
+  it "can import a file and preserve timestamp" do
+    standard_install_file_context do |workspace, global_config, context, pack, source_file|
+      ts = Time.parse('2017-06-01 12:34:56')
+      File.utime(ts, ts, source_file)
+      pack.install_file source_file, 'install_file'
+      imported_file_meta = pack.find_file('install_file')
+      expect(imported_file_meta).to_not(be_nil)
+      expect(imported_file_meta.timestamp).to eq('01.06.2017 12:34:56 t00')
+    end
+  end
+
+  it "can import a file and preserve write/delete set" do install_file_permission_test(0600, 'rwd') end
+  it "can import a file and preserve write/delete unset" do install_file_permission_test(0400, 'r') end
+  it "can import a file and preserve execute set" do install_file_permission_test(0700, 'rwed') end
+  it "can import a file and preserve execute unset" do install_file_permission_test(0600, 'rwd') end
+
+  it "can import a file into a subdirectory when case matches exactly" do
+    standard_install_file_context do |workspace, global_config, context, pack, source_file|
+      pack.install_file source_file, 'Subdirectory/install_file'
+      imported_file_meta = pack.find_file('Subdirectory/install_file')
+      expect(imported_file_meta).to_not(be_nil)
+      fn = [workspace, 'test'] + imported_file_meta.name.split('/')
+      expect(File.exist?(File.join(*fn)))
+      File.open(File.join(*fn), 'r') {|f| expect(f.read).to eq("example file being imported") }
+    end
+  end
+
+  it "can import a file into a subdirectory when case does not match exactly" do
+    standard_install_file_context do |workspace, global_config, context, pack, source_file|
+      pack.install_file source_file, 'SUBDIRECTORY/install_file'
+      imported_file_meta = pack.find_file('Subdirectory/install_file')
+      expect(imported_file_meta).to_not(be_nil)
+      expect(imported_file_meta.name).to eq('Subdirectory/install_file')
+      fn = [workspace, 'test'] + imported_file_meta.name.split('/')
+      expect(File.exist?(File.join(*fn)))
+    end
+  end
+
+  it "can replace an existing file" do
+    standard_install_file_context do |workspace, global_config, context, pack, source_file|
+      pack.install_file source_file, 'Subdirectory/File'
+      imported_file_meta = pack.find_file('Subdirectory/File')
+      expect(imported_file_meta).to_not(be_nil)
+      fn = [workspace, 'test'] + imported_file_meta.name.split('/')
+      expect(File.exist?(File.join(*fn)))
+      File.open(File.join(*fn), 'r') {|f| expect(f.read).to eq("example file being imported") }
+    end
+  end
 end
