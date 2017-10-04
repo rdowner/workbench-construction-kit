@@ -115,6 +115,22 @@ module Wbck::Util
       end
     end
 
+    def import_files(localdir, amigadir)
+      localpath = Pathname.new(localdir)
+      Dir.foreach(localdir).each do |entry|
+        next if entry == '.'
+        next if entry == '..'
+        e = localpath.join(entry)
+        a = amigadir == '' ? entry : "#{amigadir}/#{entry}"
+        if File.directory?(e)
+          mkdir(a)
+          import_files(e, a)
+        else
+          install_file(e, a)
+        end
+      end
+    end
+
     def flush
       File.open(@metafile, 'w') do |f|
         f.puts @metadata.to_s

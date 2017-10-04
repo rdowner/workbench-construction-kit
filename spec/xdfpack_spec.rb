@@ -247,4 +247,7 @@ describe Wbck::Util::XdfPack do
       expect(seen_count).to eq(1)
     end
   end
+
+  # FIXME tests for import_files
+
 end
