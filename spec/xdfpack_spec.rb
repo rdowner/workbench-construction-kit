@@ -169,4 +169,82 @@ describe Wbck::Util::XdfPack do
       File.open(File.join(*fn), 'r') {|f| expect(f.read).to eq("example file being imported") }
     end
   end
+
+  it "can make a directory in the root" do
+    standard_context do |workspace, global_config, context, pack|
+      pack.mkdir 'new_directory'
+      new_dir_meta = pack.find_file('new_directory')
+      expect(new_dir_meta).to_not(be_nil)
+      new_dir_inside_pack = pack.to_real_file('new_directory')
+      expect(File.exist?(new_dir_inside_pack))
+      expect(File.directory?(new_dir_inside_pack))
+    end
+  end
+
+  it "can make a directory with a specific timestamp" do
+    standard_context do |workspace, global_config, context, pack|
+      ts = Time.parse('2017-06-01 12:34:56')
+      pack.mkdir('new_directory', timestamp: ts)
+      new_dir_meta = pack.find_file('new_directory')
+      expect(new_dir_meta).to_not(be_nil)
+      expect(new_dir_meta.timestamp).to eq('01.06.2017 12:34:56 t00')
+      new_dir_inside_pack = pack.to_real_file('new_directory')
+      expect(File.exist?(new_dir_inside_pack))
+      expect(File.directory?(new_dir_inside_pack))
+    end
+  end
+
+  it "can make a directory with a specific mode" do
+    standard_context do |workspace, global_config, context, pack|
+      pack.mkdir('new_directory', mode: 'rw')
+      new_dir_meta = pack.find_file('new_directory')
+      expect(new_dir_meta).to_not(be_nil)
+      expect(new_dir_meta.flags).to eq('rw')
+      new_dir_inside_pack = pack.to_real_file('new_directory')
+      expect(File.exist?(new_dir_inside_pack))
+      expect(File.directory?(new_dir_inside_pack))
+    end
+  end
+
+  it "can make a subdirectory in a subdirectory when case matches exactly" do
+    standard_context do |workspace, global_config, context, pack|
+      pack.mkdir 'Subdirectory/new_directory'
+      new_dir_meta = pack.find_file('Subdirectory/new_directory')
+      expect(new_dir_meta).to_not(be_nil)
+      new_dir_inside_pack = pack.to_real_file('Subdirectory/new_directory')
+      expect(File.exist?(new_dir_inside_pack))
+      expect(File.directory?(new_dir_inside_pack))
+    end
+  end
+
+  it "can make a subdirectory in a subdirectory when case does not match exactly" do
+    standard_context do |workspace, global_config, context, pack|
+      pack.mkdir 'SUBDIRECTORY/new_directory'
+      new_dir_meta = pack.find_file('Subdirectory/new_directory')
+      expect(new_dir_meta).to_not(be_nil)
+      new_dir_inside_pack = pack.to_real_file('Subdirectory/new_directory')
+      expect(File.exist?(new_dir_inside_pack))
+      expect(File.directory?(new_dir_inside_pack))
+    end
+  end
+
+  it "fails gracefully when trying to make a directory that already exists as a file" do
+    standard_context do |workspace, global_config, context, pack|
+      expect { pack.mkdir('Disk.info') }.to raise_error(RuntimeError)
+    end
+  end
+
+  it "does nothing when trying to make a directory that already exists with the same case" do
+    standard_context do |workspace, global_config, context, pack|
+      pack.mkdir 'Subdirectory'
+    end
+  end
+
+  it "does nothing when trying to make a directory that already exists with different case" do
+    standard_context do |workspace, global_config, context, pack|
+      pack.mkdir 'SUBDIRECTORY'
+      seen_count = pack.all_content.select {|x| 'Subdirectory'.casecmp(x.name) == 0}.length
+      expect(seen_count).to eq(1)
+    end
+  end
 end

@@ -97,6 +97,24 @@ module Wbck::Util
       flush
     end
 
+    def mkdir(amiganame, timestamp: Time.now.getlocal, mode: 'rwed')
+      existing = find_file amiganame
+      if existing
+        if File.directory?(to_real_file(existing.name))
+          # directory already exists, no-op
+          return
+        else
+          # already exists, but not as a directory (therefore most likely a file)
+          raise RuntimeError, "Asked to create directory #{amiganame} but it already exists as a file"
+        end
+      else
+        metadata = XdfMeta::XdfItemMeta.new(sprintf('%s:%s,%s,%s', amiganame, mode, amitool_ts(timestamp), '')) # TODO better constructor
+        FileUtils.mkdir(to_real_file(amiganame))
+        @metadata.add_file(metadata)
+        flush
+      end
+    end
+
     def flush
       File.open(@metafile, 'w') do |f|
         f.puts @metadata.to_s
